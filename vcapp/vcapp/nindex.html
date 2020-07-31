@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>VC APP</title>
+
+    <link rel="canonical" href="https://quickblox.github.io/quickblox-javascript-sdk/samples/webrtc"/>
+    <link rel="shortcut icon" href="https://quickblox.com/favicon.ico">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/css/bootstrap.min.css">
+    <!-- use http://una.im/CSSgram/ for filters -->
+    <link rel="stylesheet" href="https://cdn.rawgit.com/una/CSSgram/master/source/css/cssgram.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <!-- app styles -->
+    <link rel="stylesheet" href="vcapp.css">
+</head>
+<body>
+    <main class="app" id="app">
+        <div class="page">
+            <!-- JOIN -->
+            <form class="join j-join">
+                <h3 class="join__title">
+                    <p>Please enter Username</p>
+                </h3>
+                
+                <div class="join__body">
+                    <div class="join__row">
+                        <input type="text" class="join__input j-join__login" name="login" placeholder="Login ID" required
+                               title="Field should contain alphanumeric characters only in a range 3 to 20. The first character must be a letter."
+                               pattern="^[a-zA-Z][\w]{2,19}$">
+                    </div>
+                    <div class="join__row">
+                        <input type="text" class="join__input j-join__username" name="username" placeholder="Name"
+                               autofocus required
+                               title="Field should contain alphanumeric characters only in a range 3 to 20. The first character must be a letter."
+                               pattern="^[a-zA-Z][\w]{2,19}$">
+                    </div>
+                    <!--<div class="join__row">
+                        <input type="password" class="join__input j-join__password" name="password" placeholder="Password" required
+                               title="Field should contain alphanumeric characters only in a range 3 to 20. The first character must be a letter."
+                               pattern="^[a-zA-Z][\w]{2,19}$">
+                     </div>-->
+                    <div class="join__row">
+                         <button type="submit" class="join__btn"  >Login</button>
+                    </div>
+                </div>
+            </form>
+
+            <div class="dashboard j-dashboard">
+                
+            </div>
+            
+        </div>
+    </main>
+    <!-- MODALS -->
+
+<div class="modal fade" id="join_err" tabindex="-1" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+
+                <h4>Connect is failed</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <p class="text-danger error">
+
+                </p>
+
+                <p class="text-danger">
+                    Something wrong with connect. Check internet connection or server credentials and trying again.
+                </p>
+            </div>
+            <p></p>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="connect_err" tabindex="-1" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+
+                <h4>Connect to chat is failed</h4>
+            </div>
+
+            <div class="modal-body">
+                <p class="text-danger">
+                    Something wrong with connect to chat. Check internet connection or user info and trying again.
+                </p>
+            </div>
+            <p></p>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="already_auth" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Warning</h4>
+            </div>
+
+            <div class="modal-body">
+                <p class="text-danger">User has already authorized.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="error_no_calles" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Error</h4>
+            </div>
+
+            <div class="modal-body">
+                <p class="text-danger">Please choose users to call</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="income_call" tabindex="-1" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4>Call from <strong class="j-ic_initiator"></strong></h4>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default j-decline">Decline</button>
+                <button type="button" class="btn btn-primary j-accept" onclick="goCall()">Accept</button>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- SOUNDS -->
+<audio id="endCallSignal" preload="auto">
+    <source src="audio/end_of_call.ogg" type="audio/ogg"/>
+    <source src="audio/end_of_call.mp3" type="audio/mp3"/>
+</audio>
+
+<audio id="callingSignal" loop preload="auto">
+    <source src="audio/calling.ogg" type="audio/ogg"/>
+    <source src="audio/calling.mp3" type="audio/mp3"/>
+</audio>
+
+<audio id="ringtoneSignal" loop preload="auto">
+    <source src="audio/ringtone.ogg" type="audio/ogg"/>
+    <source src="audio/ringtone.mp3" type="audio/mp3"/>
+</audio>
+<!--TEMPLATES-->
+<script type="text/template" id="tpl_default">
+    <ul>
+        <li><a onclick="users()"><img src="images\HOME.png" style="width:20px;height:20px;padding-right:5px;">Home</a></li>
+        <li><a><img src="images\ONLINE.png"style="width:20px;height:20px;padding-right:5px;">Online</a><li>
+        <li><a href="chat\index.html"><img src="images\profile.png"style="width:20px;height:20px;padding-right:5px;">Profile</a></li>
+    </ul>
+    <div class="antsy_low"><img src="images\antsy.png" width="150px" height="150px" style = "bottom:0px; margin-top:140%;"></div>
+</script>
+<script type="text/template" id="tpl_call_status">
+    <% if(typeof(users.accepted) !== 'undefined') { %>
+    <%  _.each(users.accepted, function(el, i, list) { %>
+    <% if(list.length === 1){ %>
+    <b><%= el.full_name %> has accepted the call.</b>
+    <% } else { %>
+    <% if( (i+1) === list.length) { %>
+    <b><%= el.full_name %></b> have accepted the call.
+    <% } else { %>
+    <b><%= el.full_name %></b>,
+    <% } %>
+    <% } %>
+    <% }); %>
+    <% } %>
+
+    <% if(typeof(users.rejected) !== 'undefined') { %>
+    <%  _.each(users.rejected, function(el, i, list) { %>
+    <% if(list.length === 1){ %>
+    <b><%= el.full_name %></b> has rejecterd the call.
+    <% } else { %>
+    <% if( (i+1) === list.length) { %>
+    <b><%= el.full_name %></b> have rejecterd the call.
+    <% } else { %>
+    <b><%= el.full_name %></b>,
+    <% } %>
+    <% } %>
+    <% }); %>
+    <% } %>
+</script>
+<script type="text/template" id="dashboard_tpl">
+    <div class="state_board j-state_board"></div>
+
+    <div class="dashboard__inner inner">
+        <div class="users j-users_wrap" ></div>
+        
+        <div class="black" style="background-color:black;width:1150px;height:100%; float:center;"><div class="board clearfix j-board"></div></div>
+    </div>
+</script>
+
+<script type="text/template" id="tpl_device_not_found">
+    Error: devices (camera or microphone) are not found.
+    
+</script>
+<script type="text/template" id="frames_tpl">
+    <div class="frames" style="display:none;">
+        <div class="antsy_top"><img src="images\2020_antsy_pittogramma_blu.png"  width="100px" height="100px" style="top:0;margin-left:1000px;z-index:10;"></div>
+        <div class="frames__main">
+            <div class="frames__main_timer invisible" id="timer">
+            </div>
+
+            <div class="qb-video">
+                <video id="main_video" class="frames__main_v qb-video_source sizin-mainvid" autoplay playsinline style="height:80%;"></video></div>
+            </div>
+        </div></div>
+        <div class="frames__callees j-callees" style="display:none"></div>
+        <div class="caller">
+                <div class="caller__ctrl" >
+                    <button class="caller__ctrl_btn j-actions m-video_call" data-call="video" onclick="goCall()"></button>
+                    <button class="caller__ctrl_btn j-actions m-audio_call" data-call="audio" onclick="goCall()"></button>
+                </div>
+            
+            <div class="caller__frames" style ="display:none;">
+            
+            <div class="qb-video" >
+                <video id="localVideo" class="qb-video_source sizinlocal" autoplay playsinline></video></div>
+            </div></div>
+            <div class="caller__frames_acts" style="display:none;margin-top:-21%; float:center;margin-left:32%;padding-right:55px;padding-bottom:20px; z-index:100;">
+                <button class="caller__frames_acts_btn j-caller__ctrl" data-target="video">
+                    <img src="images/vidicon.png" width="50px" height="50px">
+                </button>
+
+                <% if(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) { %>
+                <button class="caller__frames_acts_btn j-caller__ctrl" data-target="screen">
+                    <img src="images/sharescreen.png" width="50px" height="50px">
+                </button>
+                <% } %>
+
+
+                <button class="caller__frames_acts_btn j-caller__ctrl" data-target="audio">
+                    <img src="images/mutr.png" width="50px" height="50px">
+                </button>
+
+                <button class="hangup j-actions" >
+                    <img src="images/hangup.png" width="50px" height="50px">
+                </button>
+            </div>
+</script>
+<script type="text/template" id="callee_video">
+    <div class="frames_callee callees__callee j-callee">
+        
+        <div class="frames_callee__inner">
+            <p class="frames_callee__status j-callee_status_<%=userID%>">
+                <%=state%>
+            </p>
+
+            <div class="qb-video">
+                <video class="j-callees__callee__video qb-video_source"
+                       id="remote_video_<%=userID%>"
+                       data-user="<%=userID%>" autoplay playsinline>
+                </video>
+            </div>
+        </div>
+
+        <p class="frames_callee__name"><%=name%></p>
+
+        <div class="frames_callee__bitrate">
+            <span id="bitrate_<%=userID%>">0</span> kbps
+        </div>
+    </div>
+</script>
+<!--users-->
+<script type="text/template" id="users_tpl">
+
+    <div style="padding-bottom: 10px;">
+        <input type="text" id="search_by_username" class="join__input j-join__username" style="height: 50px;"
+               name="username" placeholder="Username" autofocus="" required="">
+    </div>
+
+    <div class="users__title" title="Choose a user to call" style="color:white;">
+        Choose a user to call
+        <button class="users__refresh j-users__refresh" title="click to refresh">
+            <svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                 xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g id="UI" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                    <g id="Main" transform="translate(-435.000000, -178.000000)">
+                        <g id="ic_refresh" transform="translate(431.000000, 174.000000)">
+                            <g id="Icon-24px" sketch:type="MSShapeGroup">
+                                <path d="M0,0 L24,0 L24,24 L0,24 L0,0 Z" id="Shape"></path>
+                                <path d="M17.65,6.35 C16.2,4.9 14.21,4 12,4 C7.58,4 4.01,7.58 4.01,12 C4.01,16.42 7.58,20 12,20 C15.73,20 18.84,17.45 19.73,14 L17.65,14 C16.83,16.33 14.61,18 12,18 C8.69,18 6,15.31 6,12 C6,8.69 8.69,6 12,6 C13.66,6 15.14,6.69 16.22,7.78 L13,11 L20,11 L20,4 L17.65,6.35 L17.65,6.35 Z"
+                                      id="Shape" fill="#808080"></path>
+                            </g>
+                        </g>
+                    </g>
+                </g>
+            </svg>
+        </button>
+    </div>
+
+    <div class="users__list j-users">
+    </div>
+</script>
+
+<script type="text/template" id="user_tpl">
+    <div class="users__item">
+        <button class="users__user j-user" data-id="<%= id %>" data-login="<%= login %>" data-name="<%= full_name %>">
+            <i class="user__icon"></i>
+            <span class="user__name"><%= full_name %></span>
+            <i class="users__btn_remove j-user-remove"></i>
+        </button>
+    </div>
+</script>
+<!-- SCRIPT -->
+<!-- dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.2.3/backbone-min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+<!-- Check our qbMediaRecorder https://github.com/QuickBlox/javascript-media-recorder -->
+<script src="https://unpkg.com/media-recorder-js@2.0.0/qbMediaRecorder.js"></script>
+
+<!-- QB -->
+<script src="../../quickblox.min.js"></script>
+<!-- app -->
+<script src="config.js"></script>
+<script src="js/helpers.js"></script>
+<script src="js/stateBoard.js"></script>
+<script src="js/app.js"></script>
+<script src="nmain.js"></script>
+<!-- hack for github Pages -->
+<script>
+    var host = "quickblox.github.io";
+    if ((host == window.location.host) && (window.location.protocol != "https:"))
+        window.location.protocol = "https";
+</script>
+</body>
+</html>
