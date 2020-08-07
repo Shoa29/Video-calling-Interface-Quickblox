@@ -16,9 +16,9 @@
 
     /** Test server / app by defaults */
     const creds = {
-        'appId': '84718',
-        'authKey': 'HUvMS8bvSWeLuzc',
-        'authSecret': 'WPROQ43N7g5dCXt'
+        'appId': '####',
+        'authKey': '#########',
+        'authSecret': '#########'
     };
 
     const config = {
